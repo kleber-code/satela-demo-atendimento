@@ -1,0 +1,13 @@
+{% extends "central/base.html" %}
+{% block titulo %}{% if obj %}Editar artigo{% else %}Novo artigo{% endif %}{% endblock %}
+{% block conteudo %}
+<div class="pagina estreita">
+<header class="pag-topo"><div><h1>{% if obj %}Editar artigo{% else %}Novo artigo{% endif %}</h1><p class="mudo"><a href="{% url 'conhecimento' %}">&larr; Base de conhecimento</a></p></div></header>
+<form method="post" class="cartao form">{% csrf_token %}
+  {{ form.non_field_errors }}
+  {% for f in form %}<div class="campo">{% if f.name == 'ativo' %}<label class="check">{{ f }} {{ f.label }}</label>{% else %}<label for="{{ f.id_for_label }}">{{ f.label }}</label>{{ f }}{% endif %}{% if f.help_text %}<small class="mudo">{{ f.help_text }}</small>{% endif %}{{ f.errors }}</div>{% endfor %}
+  <div class="botoes"><button class="btn primario">Salvar</button></div>
+</form>
+{% if obj %}<form method="post" action="{% url 'artigo_excluir' obj.pk %}" onsubmit="return confirm('Excluir este artigo?')">{% csrf_token %}<button class="btn perigo">Excluir artigo</button></form>{% endif %}
+</div>
+{% endblock %}

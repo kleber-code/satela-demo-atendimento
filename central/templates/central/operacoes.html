@@ -1,0 +1,14 @@
+{% extends "central/base.html" %}
+{% load central_tags %}
+{% block titulo %}Pedidos e ações{% endblock %}
+{% block conteudo %}
+<div class="pagina">
+<header class="pag-topo"><div><h1>Pedidos e ações da IA</h1><p class="mudo">Tabelas fictícias que o bot consulta e alimenta.</p></div></header>
+<section class="cartao"><h2>Pedidos (consulta do bot)</h2><div class="tabela-wrap"><table class="tabela"><thead><tr><th>Pedido</th><th>Cliente</th><th>Itens</th><th>Status</th><th>Previsão</th><th>Rastreio</th></tr></thead><tbody>
+{% for p in pedidos %}<tr><td data-rot="Pedido"><b>{{ p.numero }}</b></td><td data-rot="Cliente">{{ p.cliente_nome }}</td><td data-rot="Itens">{{ p.itens }}</td><td data-rot="Status"><span class="chip st-{{ p.status }}">{{ p.get_status_display }}</span></td><td data-rot="Previsão">{{ p.previsao_entrega|date:"d/m/Y"|default:"—" }}</td><td data-rot="Rastreio">{{ p.rastreio|default:"—" }}</td></tr>{% endfor %}
+</tbody></table></div></section>
+<section class="grade-2">
+<article class="cartao"><h2>Agendamentos criados pela IA</h2>{% for a in agendamentos %}<div class="linha-kv"><span><b>{{ a.get_tipo_display }}</b> · {{ a.data|date:"d/m/Y" }} ({{ a.get_periodo_display|default:a.periodo }}){% if a.conversa %} · <a href="{% url 'caixa' %}?c={{ a.conversa.pk }}">{{ a.conversa.protocolo }}</a>{% endif %}</span><span class="mudo">{{ a.unidade }}</span></div>{% empty %}<p class="mudo">Nenhum ainda. Peça ao bot no chat do cliente.</p>{% endfor %}</article>
+<article class="cartao"><h2>Chamados abertos pela IA</h2>{% for c in chamados %}<div class="linha-kv"><span><b>{{ c.protocolo }}</b> · {{ c.assunto }}{% if c.conversa %} · <a href="{% url 'caixa' %}?c={{ c.conversa.pk }}">{{ c.conversa.protocolo }}</a>{% endif %}</span><span class="chip {% if c.prioridade == 'alta' %}sla{% else %}s-bot{% endif %}">{{ c.get_prioridade_display }}</span></div>{% empty %}<p class="mudo">Nenhum ainda.</p>{% endfor %}</article>
+</section></div>
+{% endblock %}

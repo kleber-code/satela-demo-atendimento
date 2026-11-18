@@ -1,0 +1,57 @@
+{% extends "central/base.html" %}
+{% load static %}
+{% block titulo %}Chat do cliente{% endblock %}
+{% block bodyclass %}pag-demo{% endblock %}
+{% block corpo %}
+<div class="demo">
+  <aside class="demo-lado">
+    <a class="marca" href="{% url 'landing' %}"><span class="logo">A</span><span class="marca-txt">Aurora<small>Atendimento IA</small></span></a>
+    <h1>Você é o cliente</h1>
+    <p class="mudo">Converse com a assistente da <b>{{ cfg.nome_empresa }}</b> (loja fictícia). Cada mensagem aparece em tempo real na caixa de entrada do atendente.</p>
+    <h2 class="peq-titulo">Experimente</h2>
+    <div class="sugestoes">
+      <button type="button" data-sug="Qual o prazo de entrega para o interior?">Qual o prazo de entrega para o interior?</button>
+      <button type="button" data-sug="Onde está meu pedido AUR-10421?">Onde está meu pedido AUR-10421?</button>
+      <button type="button" data-sug="Quero agendar a retirada do pedido na loja">Quero agendar a retirada na loja</button>
+      <button type="button" data-sug="Meu produto chegou com defeito, como faço?">Meu produto chegou com defeito</button>
+      <button type="button" data-sug="Tem cupom de desconto para primeira compra?">Tem cupom de primeira compra? (o bot não sabe)</button>
+      <button type="button" data-sug="Quero falar com um atendente">Quero falar com um atendente</button>
+    </div>
+    <p class="mudo pequeno">Pedidos de exemplo: AUR-10421 a AUR-10431.</p>
+    <div class="cartao-mini">
+      <b>Do outro lado</b>
+      <p class="mudo">Abra a caixa de entrada em outra aba para ver a conversa chegar e responder como atendente.</p>
+      <a class="btn pequeno primario" href="{% url 'entrar' %}" target="_blank" rel="noopener">Abrir caixa de entrada</a>
+    </div>
+    <p class="mudo pequeno">Atendimento humano: {{ horario }}. {% if aberto %}<span class="ponto on"></span>Aberto agora{% else %}<span class="ponto"></span>Fechado agora{% endif %}</p>
+    <button type="button" class="tema-btn lado" data-alternar-tema aria-label="Alternar tema"><svg><use href="#i-moon"/></svg> Tema</button>
+  </aside>
+  <main id="conteudo" class="demo-chat">
+    <div class="chat" id="chat" data-enviar="{% url 'api_enviar' %}" data-msgs="{% url 'api_mensagens' %}" data-avaliar="{% url 'api_avaliar' %}" data-encerrar="{% url 'api_encerrar' %}" data-nova="{% url 'api_nova' %}" data-max="{{ max_chars }}">
+      {% csrf_token %}
+      <header class="chat-topo">
+        <span class="avatar grande" style="background:var(--verde)">A</span>
+        <div><b>{{ cfg.nome_bot }} · {{ cfg.nome_empresa }}</b><small id="chat-sub"><span class="ponto on"></span>assistente virtual · responde na hora</small></div>
+        <button type="button" class="icone" id="btn-nova" title="Começar uma nova conversa" aria-label="Nova conversa">↺</button>
+      </header>
+      <div class="faixa-estado" id="faixa-estado" hidden></div>
+      <div class="chat-msgs" id="chat-msgs" role="log" aria-live="polite" aria-label="Conversa"></div>
+      <div class="avaliacao" id="avaliacao" hidden>
+        <p><b>Como foi o atendimento?</b></p>
+        <div class="estrelas-input" id="estrelas" role="radiogroup" aria-label="Nota de 1 a 5">
+          {% for i in "12345" %}<button type="button" role="radio" aria-checked="false" data-nota="{{ i }}" aria-label="{{ i }} estrela{{ i|pluralize }}">★</button>{% endfor %}
+        </div>
+        <p class="mudo pequeno" id="obrigado" hidden>Obrigado pela avaliação! Ela entra nas métricas de CSAT.</p>
+      </div>
+      <form class="chat-form" id="chat-form" autocomplete="off">
+        <textarea id="chat-texto" rows="1" maxlength="{{ max_chars }}" placeholder="Escreva sua mensagem..." aria-label="Sua mensagem"></textarea>
+        <button class="btn primario enviar" id="chat-enviar" aria-label="Enviar"><svg><use href="#i-send"/></svg></button>
+      </form>
+      <div class="chat-pe"><button type="button" class="link" id="btn-encerrar">Encerrar e avaliar</button><span class="mudo pequeno" id="contador">0/{{ max_chars }}</span></div>
+    </div>
+  </main>
+</div>
+{{ inicial|json_script:"inicial" }}
+{{ estado|json_script:"estado" }}
+{% endblock %}
+{% block scripts %}<script src="{% static 'central/widget.js' %}"></script>{% endblock %}

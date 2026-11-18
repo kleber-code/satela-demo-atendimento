@@ -1,0 +1,45 @@
+{% extends "central/base.html" %}
+{% block titulo %}Métricas{% endblock %}
+{% block conteudo %}
+<div class="pagina">
+<header class="pag-topo">
+  <div><h1>Métricas de atendimento</h1><p class="mudo">Últimos {{ m.dias }} dias · {{ m.total }} conversas</p></div>
+  <form method="get" class="seg" role="group" aria-label="Período">
+    <button name="dias" value="7" class="{% if m.dias == 7 %}ativo{% endif %}">7 dias</button>
+    <button name="dias" value="14" class="{% if m.dias == 14 %}ativo{% endif %}">14 dias</button>
+    <button name="dias" value="30" class="{% if m.dias == 30 %}ativo{% endif %}">30 dias</button>
+  </form>
+</header>
+<section class="kpis">
+  <article class="kpi destaque"><span class="kpi-rot">Resolvido pelo bot</span><b>{{ m.taxa_bot }}%</b><small>das conversas resolvidas</small></article>
+  <article class="kpi"><span class="kpi-rot">Contenção do bot</span><b>{{ m.contencao }}%</b><small>nunca precisaram de humano</small></article>
+  <article class="kpi"><span class="kpi-rot">1ª resposta (bot)</span><b>{{ m.tempo_bot }}</b><small>tempo médio</small></article>
+  <article class="kpi"><span class="kpi-rot">1ª resposta (humano)</span><b>{{ m.tempo_humano }}</b><small>meta {{ m.sla_min }} min · {{ m.sla_prazo }}% no prazo</small></article>
+  <article class="kpi"><span class="kpi-rot">CSAT</span><b>{% if m.csat %}{{ m.csat }}<span class="de">/5</span>{% else %}—{% endif %}</b><small>{{ m.csat_n }} avaliações</small></article>
+  <article class="kpi"><span class="kpi-rot">Em aberto agora</span><b>{{ m.abertas }}</b><small>conversas no período</small></article>
+</section>
+<section class="grade-2">
+  <article class="cartao"><h2>Volume por hora do dia</h2><p class="mudo pequeno">Pico às {{ m.pico_hora|default:"—" }}h (destacado)</p>{{ m.g_hora }}</article>
+  <article class="cartao"><h2>Conversas por status</h2>
+    <div class="rosca-wrap">{{ m.g_status }}
+      <ul class="legenda">{% for rot, v, cls in m.status_legenda %}<li><span class="dot {{ cls }}"></span>{{ rot }} <b>{{ v }}</b></li>{% endfor %}</ul></div>
+  </article>
+</section>
+<section class="grade-2">
+  <article class="cartao"><h2>Conversas por dia</h2>{{ m.g_dias }}</article>
+  <article class="cartao"><h2>Notas de CSAT</h2>{{ m.g_csat }}<p class="mudo pequeno">CSAT simulado: vem das avaliações do chat de demonstração e dos dados de exemplo.</p></article>
+</section>
+<section class="grade-2">
+  <article class="cartao"><h2>Ações executadas pela IA</h2>
+    {% for nome, v, pct in m.acoes_barras %}<div class="hbar"><span>{{ nome }}</span><div class="trilho"><div class="preenche" style="width:{{ pct }}%"></div></div><b>{{ v }}</b></div>
+    {% empty %}<p class="mudo">Nenhuma ação no período.</p>{% endfor %}
+    <p class="mudo pequeno">{{ m.agendamentos }} agendamentos e {{ m.chamados }} chamados no total.</p></article>
+  <article class="cartao"><h2>Por que o bot transferiu</h2>
+    {% for rot, v in m.falhas_rot %}<div class="linha-kv"><span>{{ rot }}</span><b>{{ v }}</b></div>{% empty %}<p class="mudo">Sem transferências no período.</p>{% endfor %}
+    <p><a href="{% url 'treinar' %}">Ver conversas em que o bot falhou &rarr;</a></p></article>
+</section>
+<section class="cartao custo"><h2>Custo de IA hoje</h2>
+  <div class="hbar"><span>Chamadas à IA</span><div class="trilho"><div class="preenche" style="width:{% widthratio m.ia_usada m.ia_teto 100 %}%"></div></div><b>{{ m.ia_usada }} / {{ m.ia_teto }}</b></div>
+  <p class="mudo pequeno">Teto diário global configurável. Ao atingir o teto, o bot responde com mensagens pré-definidas.</p></section>
+</div>
+{% endblock %}

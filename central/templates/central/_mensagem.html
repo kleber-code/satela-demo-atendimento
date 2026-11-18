@@ -1,0 +1,7 @@
+{% load central_tags %}{% if m.tipo == 'sistema' %}<div class="msg-sis" data-id="{{ m.id }}"><span>{{ m.texto|fmt }}</span></div>
+{% elif m.tipo == 'acao' %}<div class="msg-acao {% if not m.acao.ok %}falhou{% endif %}" data-id="{{ m.id }}"><svg><use href="#i-spark"/></svg><span><b>IA usou uma ação · {{ m.acao.rotulo }}</b> {{ m.texto }}</span></div>
+{% elif m.tipo == 'nota' %}<div class="linha dir" data-id="{{ m.id }}"><div class="bolha nota"><div class="meta">Nota interna{% if m.usuario %} · {{ m.usuario.perfil.nome }}{% else %} · IA{% endif %} · {{ m.criada_em|hora }}</div>{{ m.texto|fmt }}</div></div>
+{% else %}<div class="linha {% if m.tipo == 'cliente' %}esq{% else %}dir{% endif %}" data-id="{{ m.id }}"><div class="bolha {{ m.tipo }}">
+<div class="meta">{% if m.tipo == 'bot' %}Aurora (IA){% elif m.tipo == 'atendente' %}{{ m.usuario.perfil.nome|default:"Atendente" }}{% else %}Cliente{% endif %} · {{ m.criada_em|hora }}{% if m.fallback %} · <span class="sel-fb" title="Resposta pré-definida: a IA estava indisponível, sem chave ou acima do teto">pré-definida</span>{% endif %}</div>
+{{ m.texto|fmt }}{% if m.fontes %}<div class="fontes">{% for f in m.fontes %}<span class="fonte"><svg><use href="#i-book"/></svg>Fonte: {{ f.titulo }}</span>{% endfor %}</div>{% endif %}</div></div>
+{% endif %}

@@ -1,0 +1,52 @@
+{% load central_tags %}
+<div class="conv" id="conv" data-id="{{ c.pk }}" data-ultimo="{{ ultimo }}" data-estado="{{ estado }}" data-url-msgs="{% url 'conversa_mensagens' c.pk %}" data-url-enviar="{% url 'conversa_enviar' c.pk %}" data-url-acao="{% url 'conversa_acao' c.pk %}" data-url-painel="{% url 'conversa' c.pk %}">
+  <header class="conv-topo">
+    <button class="icone voltar" type="button" data-voltar aria-label="Voltar para a lista"><svg><use href="#i-back"/></svg></button>
+    <span class="avatar grande" style="background:{{ c.cliente.cor }}">{{ c.cliente.iniciais }}</span>
+    <div class="conv-id">
+      <h2>{{ c.cliente.nome }}</h2>
+      <p class="mudo">{{ c.protocolo }} · {% if c.canal == 'whatsapp' %}WhatsApp{% else %}Chat do site{% endif %} · {{ c.cliente.telefone|default:"sem telefone" }} · desde {{ c.criada_em|date:"d/m H:i" }}</p>
+    </div>
+    <span class="chip s-{{ c.status }} grande-chip">{{ c.get_status_display }}</span>
+  </header>
+  <div class="conv-barra">
+    {% if pode_agir %}
+    <div class="acoes">
+      {% if c.status != 'resolvida' %}
+        {% if c.atribuido_id != request.user.id %}<button class="btn pequeno primario" data-acao="assumir">Assumir</button>{% endif %}
+        <button class="btn pequeno" data-acao="resolver">Resolver</button>
+        {% if c.status != 'bot' %}<button class="btn pequeno" data-acao="devolver_bot" title="Devolve a conversa para o assistente virtual">Devolver ao bot</button>{% endif %}
+      {% else %}<button class="btn pequeno" data-acao="reabrir">Reabrir</button>{% endif %}
+      <label class="sel-atrib">Atendente
+        <select data-atribuir aria-label="Atribuir a atendente">
+          <option value="">— sem responsável —</option>
+          {% for u in atendentes %}<option value="{{ u.pk }}" {% if u.pk == c.atribuido_id %}selected{% endif %}>{{ u.perfil.nome }}</option>{% endfor %}
+        </select>
+      </label>
+    </div>
+    <div class="etiquetas-edit" role="group" aria-label="Etiquetas">
+      {% for e in etiquetas %}<button type="button" class="tag {% if e.pk in etiquetas_ids %}ligada{% endif %}" style="--cor:{{ e.cor }}" data-etiqueta="{{ e.pk }}" aria-pressed="{% if e.pk in etiquetas_ids %}true{% else %}false{% endif %}">{{ e.nome }}</button>{% endfor %}
+    </div>
+    {% else %}<p class="mudo pequeno">Conversa de {{ c.atribuido.perfil.nome }}: somente leitura para você.</p>{% endif %}
+  </div>
+  {% if c.resumo_ia %}<div class="resumo"><svg><use href="#i-spark"/></svg><div><b>Resumo da IA</b><p>{{ c.resumo_ia }}</p></div></div>{% endif %}
+  {% if c.csat %}<div class="csat-linha">Avaliação do cliente: <span class="estrelas" aria-label="{{ c.csat }} de 5">{{ c.csat|estrelas }}</span></div>{% endif %}
+  <div class="mensagens" id="mensagens" tabindex="0" aria-label="Mensagens da conversa">
+    {% for m in mensagens %}{% include "central/_mensagem.html" %}{% endfor %}
+  </div>
+  {% if pode_agir %}
+  <form class="compor" id="compor" autocomplete="off">
+    <div class="modo" role="radiogroup" aria-label="Tipo de mensagem">
+      <label><input type="radio" name="tipo" value="resposta" checked> Responder ao cliente</label>
+      <label><input type="radio" name="tipo" value="nota"> Nota interna</label>
+      {% if not aberto %}<span class="mudo pequeno">· fora do expediente</span>{% endif %}
+    </div>
+    <div class="rapidas" id="rapidas" hidden></div>
+    <div class="entrada">
+      <textarea name="texto" rows="2" placeholder="Escreva uma resposta... digite / para respostas rápidas" aria-label="Mensagem" maxlength="2000"></textarea>
+      <button class="btn primario enviar" type="submit" aria-label="Enviar"><svg><use href="#i-send"/></svg></button>
+    </div>
+    <script type="application/json" id="rapidas-dados">[{% for r in rapidas %}{"atalho":"{{ r.atalho|escapejs }}","titulo":"{{ r.titulo|escapejs }}","texto":"{{ r.texto|escapejs }}"}{% if not forloop.last %},{% endif %}{% endfor %}]</script>
+  </form>
+  {% endif %}
+</div>

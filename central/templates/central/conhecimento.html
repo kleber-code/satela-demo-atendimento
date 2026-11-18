@@ -1,0 +1,22 @@
+{% extends "central/base.html" %}
+{% block titulo %}Base de conhecimento{% endblock %}
+{% block conteudo %}
+<div class="pagina">
+<header class="pag-topo"><div><h1>Base de conhecimento</h1><p class="mudo">Artigos que o bot usa para responder e citar a fonte. {{ artigos|length }} artigos.</p></div>
+{% if pode_editar %}<a class="btn primario" href="{% url 'artigo_novo' %}">Novo artigo</a>{% endif %}</header>
+<form method="get" class="busca-grande"><svg><use href="#i-search"/></svg><input type="search" name="q" value="{{ q }}" placeholder="Teste a busca como o bot faz: ex. 'prazo para o interior'" aria-label="Testar busca"><button class="btn">Buscar</button></form>
+{% if q %}<section class="cartao"><h2>Resultado para &ldquo;{{ q }}&rdquo;</h2>
+  {% for a, s, ok in resultado %}<div class="linha-kv"><span><b>{{ a.titulo }}</b> <span class="mudo">· {{ a.categoria }}</span></span><span class="chip {% if ok %}s-resolvida{% else %}s-bot{% endif %}">pontuação {{ s|floatformat:0 }}{% if ok %} · confiante{% endif %}</span></div>
+  {% empty %}<p class="mudo">Nada encontrado: com essa pergunta o bot transferiria para um humano.</p>{% endfor %}
+  <p class="mudo pequeno">Confiança a partir de {{ limiar|floatformat:0 }} pontos (título e palavras-chave valem mais que o corpo do texto).</p></section>{% endif %}
+<section class="grade-cards">
+  {% for a in artigos %}
+  <article class="cartao artigo {% if not a.ativo %}inativo{% endif %}">
+    <span class="tag" style="--cor:var(--verde)">{{ a.categoria }}</span>
+    <h3>{% if pode_editar %}<a href="{% url 'artigo_editar' a.pk %}">{{ a.titulo }}</a>{% else %}{{ a.titulo }}{% endif %}</h3>
+    <p class="mudo">{{ a.conteudo|truncatechars:170 }}</p>
+    <p class="pequeno mudo">Citado {{ a.citacoes }}x pelo bot{% if not a.ativo %} · inativo{% endif %}</p>
+  </article>{% endfor %}
+</section>
+</div>
+{% endblock %}

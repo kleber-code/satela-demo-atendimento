@@ -1,0 +1,21 @@
+{% extends "central/base.html" %}
+{% block titulo %}Configurações{% endblock %}
+{% block conteudo %}
+<div class="pagina">
+<header class="pag-topo"><div><h1>Configurações</h1><p class="mudo">Expediente, SLA e proteção de custo.</p></div></header>
+<section class="grade-2 topo">
+<form method="post" class="cartao form">{% csrf_token %}<h2>Expediente e SLA</h2>
+  <p>Agora: {% if aberto %}<span class="chip s-resolvida">atendimento humano aberto</span>{% else %}<span class="chip s-aguardando">fora do expediente</span>{% endif %} <span class="mudo">({{ horario }})</span></p>
+  {% if not pode %}<p class="aviso info">Somente supervisores podem editar.</p>{% endif %}
+  {{ form.non_field_errors }}
+  {% for f in form %}<div class="campo"><label for="{{ f.id_for_label }}">{{ f.label }}</label>{{ f }}{% if f.help_text %}<small class="mudo">{{ f.help_text }}</small>{% endif %}{{ f.errors }}</div>{% endfor %}
+  {% if pode %}<div class="botoes"><button class="btn primario">Salvar</button></div>{% endif %}
+</form>
+<div class="cartao"><h2>Proteção de custo</h2>
+  <p class="mudo">A demonstração é pública e a IA tem custo. Os limites abaixo vêm de variáveis de ambiente.</p>
+  <div class="hbar"><span>IA hoje</span><div class="trilho"><div class="preenche" style="width:{% widthratio ia_usada ia_teto 100 %}%"></div></div><b>{{ ia_usada }} / {{ ia_teto }}</b></div>
+  {% for rot, v in limites %}<div class="linha-kv"><span>{{ rot }}</span><b>{{ v }}</b></div>{% endfor %}
+  <div class="linha-kv"><span>Modelo</span><b>{{ modelo }}</b></div>
+  <div class="linha-kv"><span>Chave da IA</span><b>{% if ia_chave %}configurada (oculta){% else %}ausente: respostas pré-definidas{% endif %}</b></div>
+</div></section></div>
+{% endblock %}

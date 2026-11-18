@@ -1,0 +1,35 @@
+{% extends "central/base.html" %}
+{% load static %}
+{% block titulo %}Caixa de entrada{% endblock %}
+{% block bodyclass %}pag-caixa{% endblock %}
+{% block conteudo %}
+<div class="caixa {% if selecionada %}com-conversa{% endif %}" id="caixa" data-lista="{% url 'caixa_lista' %}">
+  <aside class="coluna-lista" aria-label="Conversas">
+    <form class="filtros" method="get" id="form-filtros">
+      <div class="busca"><svg><use href="#i-search"/></svg><input type="search" name="q" value="{{ filtro.q }}" placeholder="Buscar cliente, texto ou AT-00012" aria-label="Buscar conversas"></div>
+      <div class="abas" role="tablist">
+        <button name="status" value="" class="{% if not filtro.status %}ativo{% endif %}">Todas</button>
+        <button name="status" value="aguardando" class="{% if filtro.status == 'aguardando' %}ativo{% endif %}">Aguardando <i>{{ contagens.aguardando }}</i></button>
+        <button name="status" value="atendimento" class="{% if filtro.status == 'atendimento' %}ativo{% endif %}">Em atendimento <i>{{ contagens.atendimento }}</i></button>
+        <button name="status" value="bot" class="{% if filtro.status == 'bot' %}ativo{% endif %}">Bot <i>{{ contagens.bot }}</i></button>
+        <button name="status" value="resolvida" class="{% if filtro.status == 'resolvida' %}ativo{% endif %}">Resolvidas <i>{{ contagens.resolvida }}</i></button>
+      </div>
+      <div class="linha-filtros">
+        <select name="etiqueta" aria-label="Filtrar por etiqueta" onchange="this.form.submit()">
+          <option value="">Todas as etiquetas</option>
+          {% for e in etiquetas %}<option value="{{ e.pk }}" {% if filtro.etiqueta == e.pk|stringformat:"s" %}selected{% endif %}>{{ e.nome }}</option>{% endfor %}
+        </select>
+        <label class="check"><input type="checkbox" name="minhas" value="1" {% if filtro.minhas %}checked{% endif %} onchange="this.form.submit()"> Só minhas</label>
+      </div>
+      {% if selecionada %}<input type="hidden" name="c" value="{{ selecionada }}">{% endif %}
+    </form>
+    <div class="lista" id="lista">{% include "central/_lista.html" %}</div>
+  </aside>
+  <section class="coluna-conversa" id="painel" aria-live="off">
+    {% if pane %}{{ pane|safe }}{% else %}
+    <div class="vazio-conversa"><svg><use href="#i-chat"/></svg><h2>Escolha uma conversa</h2><p class="mudo">Selecione um atendimento à esquerda. Dica: comece pelos que estão <b>aguardando humano</b>.</p></div>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}
+{% block scripts %}<script src="{% static 'central/caixa.js' %}"></script>{% endblock %}

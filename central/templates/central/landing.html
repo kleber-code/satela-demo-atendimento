@@ -1,0 +1,33 @@
+{% extends "central/base.html" %}
+{% block corpo %}
+<header class="topo-pub">
+  <a class="marca" href="{% url 'landing' %}"><span class="logo">A</span><span class="marca-txt">Aurora<small>Atendimento IA</small></span></a>
+  <nav><a href="{% url 'demo' %}">Chat do cliente</a><a href="{% url 'entrar' %}">Painel</a><button type="button" class="tema-btn" data-alternar-tema aria-label="Alternar tema"><svg><use href="#i-moon"/></svg></button></nav>
+</header>
+<main id="conteudo" class="landing">
+  <section class="hero">
+    <p class="selo"><svg><use href="#i-spark"/></svg> Central de atendimento com IA</p>
+    <h1>Seu time de atendimento, com um assistente que resolve, e sabe a hora de chamar uma pessoa.</h1>
+    <p class="lead">Caixa de entrada estilo WhatsApp, bot treinado na sua base de conhecimento, ações automáticas (pedido, agendamento, chamado) e transferência para humano com resumo da conversa. Veja funcionando em 2 minutos.</p>
+    <div class="cta">
+      <a class="btn primario grande" href="{% url 'demo' %}">Conversar como cliente</a>
+      <a class="btn grande" href="{% url 'entrar' %}">Abrir a caixa de entrada</a>
+    </div>
+    <p class="mudo pequeno">Sem cadastro. Dados fictícios de uma loja de eletro e tecnologia.{% if not ia_real %} A IA está em modo de respostas pré-definidas nesta instância.{% endif %}</p>
+  </section>
+  <section class="numeros" aria-label="Números da demonstração">
+    <div><b>{{ total }}</b><span>conversas de exemplo</span></div>
+    <div><b>{{ pct_bot }}%</b><span>resolvidas só pelo bot</span></div>
+    <div><b>24h</b><span>bot sempre disponível</span></div>
+    <div><b>3</b><span>ações automáticas</span></div>
+  </section>
+  <section class="recursos">
+    <article><h3>Caixa de entrada</h3><p>Status, etiquetas, atribuição, notas internas, busca e filtros. Tudo atualiza sozinho.</p></article>
+    <article><h3>Bot com base de conhecimento</h3><p>Responde citando a fonte. Se não sabe, transfere com um resumo gerado pela IA.</p></article>
+    <article><h3>Ações da IA visíveis</h3><p>Consulta de pedido, agendamento e abertura de chamado aparecem na conversa.</p></article>
+    <article><h3>Métricas que importam</h3><p>1ª resposta, % resolvido pelo bot, volume por hora, SLA e CSAT, com gráficos próprios.</p></article>
+    <article><h3>Custo sob controle</h3><p>Limites por IP e sessão, teto diário de chamadas e respostas pré-definidas como plano B.</p></article>
+    <article><h3>Pronto para WhatsApp</h3><p>Camada de canais desacoplada: o canal web funciona hoje, o WhatsApp encaixa pelo mesmo contrato.</p></article>
+  </section>
+</main>
+{% endblock %}

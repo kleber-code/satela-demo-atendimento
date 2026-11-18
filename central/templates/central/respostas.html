@@ -1,0 +1,15 @@
+{% extends "central/base.html" %}
+{% block titulo %}Respostas rápidas{% endblock %}
+{% block conteudo %}
+<div class="pagina">
+<header class="pag-topo"><div><h1>Respostas rápidas</h1><p class="mudo">Na caixa de entrada, digite o atalho (ex.: <code>/prazo</code>) para inserir o texto.</p></div></header>
+<section class="grade-2 topo">
+<div class="cartao"><h2>Atalhos</h2>
+{% for r in itens %}<div class="rapida"><div><code>{{ r.atalho }}</code> <b>{{ r.titulo }}</b><p class="mudo">{{ r.texto }}</p></div>
+<form method="post">{% csrf_token %}<input type="hidden" name="excluir" value="{{ r.pk }}"><button class="btn pequeno perigo" aria-label="Excluir {{ r.atalho }}">Excluir</button></form></div>{% endfor %}</div>
+<form method="post" class="cartao form">{% csrf_token %}<h2>Nova resposta</h2>
+{{ form.non_field_errors }}
+{% for f in form %}<div class="campo"><label for="{{ f.id_for_label }}">{{ f.label }}</label>{{ f }}{{ f.errors }}</div>{% endfor %}
+<div class="botoes"><button class="btn primario">Salvar</button></div></form>
+</section></div>
+{% endblock %}

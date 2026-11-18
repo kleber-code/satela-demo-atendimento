@@ -1,0 +1,19 @@
+{% load central_tags %}
+{% for c in conversas %}
+<a class="item {% if c.pk == selecionada %}sel{% endif %}" href="{% url 'caixa' %}?c={{ c.pk }}{% if filtro.status %}&status={{ filtro.status }}{% endif %}{% if filtro.q %}&q={{ filtro.q|urlencode }}{% endif %}" data-id="{{ c.pk }}">
+  <span class="avatar" style="background:{{ c.cliente.cor }}">{{ c.cliente.iniciais }}</span>
+  <span class="item-corpo">
+    <span class="item-linha"><b class="nome">{{ c.cliente.nome }}</b><time class="mudo">{{ c.atualizada_em|quando }}</time></span>
+    <span class="item-linha"><span class="previa">{{ c.ultima_previa|default:"(sem mensagens)" }}</span>{% if c.nao_lidas %}<span class="badge-n" aria-label="{{ c.nao_lidas }} não lidas">{{ c.nao_lidas }}</span>{% endif %}</span>
+    <span class="item-linha chips">
+      <span class="chip s-{{ c.status }}">{{ c.get_status_display }}</span>
+      {% if c.sla_estourado %}<span class="chip sla" title="Meta de primeira resposta estourada">SLA {{ c.aguardando_desde|espera }}</span>{% endif %}
+      {% for e in c.etiquetas.all|slice:":2" %}<span class="tag" style="--cor:{{ e.cor }}">{{ e.nome }}</span>{% endfor %}
+      {% if c.canal == 'whatsapp' %}<span class="canal" title="Canal WhatsApp (simulado)">WA</span>{% endif %}
+      {% if c.atribuido %}<span class="mini-av" style="background:{{ c.atribuido.perfil.cor }}" title="{{ c.atribuido.perfil.nome }}">{{ c.atribuido.perfil.iniciais }}</span>{% endif %}
+    </span>
+  </span>
+</a>
+{% empty %}
+<div class="vazio-lista"><p><b>Nenhuma conversa encontrada.</b></p><p class="mudo">Ajuste os filtros ou abra o <a href="{% url 'demo' %}" target="_blank" rel="noopener">chat do cliente</a> e mande uma mensagem: ela aparece aqui em segundos.</p></div>
+{% endfor %}
